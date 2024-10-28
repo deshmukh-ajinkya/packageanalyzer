@@ -8,21 +8,22 @@ import { searchRepositories } from "./config/axios.config";
 import { useState, useRef } from "react";
 
 function App() {
+  const [projectName, setProjectName] = useState(""); // State for project name
   const [depName, setDepName] = useState("");
   const [tableData, setTableData] = useState([]);
   const fileInputRef = useRef(null);
 
-  // Handle the file upload
+  // Handle file upload
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file && file.type === "application/json") {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const json = JSON.parse(e.target.result);
+        setProjectName(json.name || "Unknown Project"); // Extract project name
         const dependencies = Object.keys(json.dependencies || {});
         setTableData([]); // Clear the table data initially
 
-        // Fetch repository data for each dependency
         const fetchedData = await Promise.all(
           dependencies.map(async (dep) => {
             try {
@@ -36,8 +37,6 @@ function App() {
             return null;
           })
         );
-
-        // Filter out any null results and set the table data
         setTableData(fetchedData.filter(Boolean));
       };
       reader.readAsText(file);
@@ -46,9 +45,24 @@ function App() {
     }
   };
 
-  // Trigger file input click on button click
   const handleUploadClick = () => {
     fileInputRef.current.click();
+  };
+
+  // Handle the search by dependency name
+  const handleSearch = async () => {
+    if (depName.trim() !== "") {
+      try {
+        const response = await searchRepositories(depName);
+        if (response && response.data.items.length > 0) {
+          setTableData([response.data.items[0]]); // Set only the first match
+        } else {
+          setTableData([]);
+        }
+      } catch (error) {
+        console.error("Error fetching data for the search:", error);
+      }
+    }
   };
 
   return (
@@ -60,30 +74,60 @@ function App() {
       </div>
       <div
         style={{
+          marginTop: "18px",
           paddingInline: "16px",
           display: "flex",
           gap: "12px",
           alignItems: "center",
+          flexWrap: "wrap",
         }}
       >
+        <p
+          style={{
+            flex: 3,
+            color: "#008AE6",
+            fontSize: "20px",
+            fontWeight: 600,
+          }}
+        >
+          Project Name: <span style={{ color: "#000000" }}>{projectName}</span>
+        </p>
+        <input
+          type="text"
+          style={{
+            flex: 2,
+            height: "36px",
+            borderRadius: "4px",
+            border: "1px solid #D6D6D6",
+            paddingInline: "12px",
+          }}
+          placeholder="Enter Dependency Name"
+          value={depName}
+          onChange={(e) => setDepName(e.target.value)}
+        />
+        <img
+          src={Search}
+          alt="search-icon"
+          style={{ cursor: "pointer" }}
+          onClick={handleSearch} // Trigger search on click
+        />
         <button
           onClick={handleUploadClick}
           style={{
-            marginTop: "24px",
             flex: 1,
             height: "43px",
-            borderRadius: "6px",
+            borderRadius: "24px",
             backgroundColor: "#FFA500",
             color: "#ffffff",
             border: "2px solid #D6D6D6",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "8px",
+            gap: "4px",
           }}
         >
           <img src={Upload} alt="upload-icon" width="20px" />
-          Upload
+          Import package.json
         </button>
         <input
           type="file"
@@ -99,6 +143,8 @@ function App() {
           marginInline: "12px",
           borderRadius: "8px",
           marginTop: "16px",
+          overflowX: "scroll",
+          scrollbarWidth: "none",
         }}
       >
         <table
@@ -111,9 +157,7 @@ function App() {
         >
           <thead>
             <tr>
-              <th style={{ fontSize: "18px", fontWeight: 600 }}>
-                Dependency Name
-              </th>
+              <th style={{ fontSize: "18px", fontWeight: 600 }}>Dependency</th>
               <th style={{ fontSize: "18px", fontWeight: 600 }}>Stars</th>
               <th style={{ fontSize: "18px", fontWeight: 600 }}>Forks</th>
               <th style={{ fontSize: "18px", fontWeight: 600 }}>Homepage</th>
@@ -124,10 +168,26 @@ function App() {
             {tableData.length > 0 ? (
               tableData.map((repo, index) => (
                 <tr key={index}>
-                  <td>{repo.name}</td>
+                  <td
+                    style={{
+                      maxWidth: "150px",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {repo.name}
+                  </td>
                   <td>{repo.stargazers_count}</td>
                   <td>{repo.forks_count}</td>
-                  <td>
+                  <td
+                    style={{
+                      maxWidth: "120px",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
                     {repo.homepage ? (
                       <a
                         href={repo.homepage}
