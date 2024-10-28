@@ -1,12 +1,30 @@
-import "./App.css";
 import Logo from "./assets/logo.png";
 import Approve from "./assets/approve.png";
 import Reject from "./assets/reject.png";
 import Search from "./assets/search.png";
-import Download from "./assets/download.png";
 import Upload from "./assets/upload.png";
+import "./App.css";
+import { searchRepositories } from "./config/axios.config";
+import { useState } from "react";
 
 function App() {
+  const [depName, setDepName] = useState("");
+  const [data, setData] = useState(null); // Initialize with null
+
+  const handleSearch = async () => {
+    const result = await searchRepositories(depName);
+    if (
+      result &&
+      result.data &&
+      result.data.items &&
+      result.data.items.length > 0
+    ) {
+      setData(result.data.items[0]); // Set the first repository's data
+    } else {
+      setData(null); // No results found
+    }
+  };
+
   return (
     <>
       <div
@@ -54,6 +72,7 @@ function App() {
               textAlign: "left",
             }}
             placeholder="Dependency Name"
+            onChange={(e) => setDepName(e.target.value)}
           />
           <span
             style={{
@@ -68,26 +87,10 @@ function App() {
               alt="search-icon"
               width="24px"
               style={{ alignSelf: "flex-end" }}
+              onClick={handleSearch} // Use the handleSearch function
             />
           </span>
         </div>
-        <button
-          style={{
-            flex: 1,
-            height: "43px",
-            borderRadius: "6px",
-            backgroundColor: "#81E681",
-            color: "#ffffff",
-            border: "2px solid #D6D6D6",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-          }}
-        >
-          <img src={Download} alt="download-icon" width="20px" />
-          Download
-        </button>
         <button
           style={{
             flex: 1,
@@ -121,36 +124,70 @@ function App() {
             borderSpacing: "0px 12px",
           }}
         >
-          <tr style={{ marginBlock: "12px" }}>
-            <th style={{ fontSize: "18px", fontWeight: 600 }}>
-              Dependency Name
-            </th>
-            <th style={{ fontSize: "18px", fontWeight: 600 }}>Stars</th>
-            <th style={{ fontSize: "18px", fontWeight: 600 }}>Contributors</th>
-            <th style={{ fontSize: "18px", fontWeight: 600 }}>Watching</th>
-            <th style={{ fontSize: "18px", fontWeight: 600 }}>Forks</th>
-            <th style={{ fontSize: "18px", fontWeight: 600 }}>Status</th>
-          </tr>
-          <tr>
-            <td>React.js</td>
-            <td>229K</td>
-            <td>1k</td>
-            <td>6k</td>
-            <td>48k</td>
-            <td>
-              <img src={Approve} alt="approve" width="12px" />
-            </td>
-          </tr>
-          <tr>
-            <td>Weak.js</td>
-            <td>2</td>
-            <td>1</td>
-            <td>6</td>
-            <td>4</td>
-            <td>
-              <img src={Reject} alt="reject" width="12px" />
-            </td>
-          </tr>
+          <thead>
+            <tr>
+              <th style={{ fontSize: "18px", fontWeight: 600 }}>
+                Dependency Name
+              </th>
+              <th style={{ fontSize: "18px", fontWeight: 600 }}>Stars</th>
+              <th style={{ fontSize: "18px", fontWeight: 600 }}>Forks</th>
+              <th style={{ fontSize: "18px", fontWeight: 600 }}>Homepage</th>
+              <th style={{ fontSize: "18px", fontWeight: 600 }}>Descriptor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data ? (
+              <tr>
+                <td>{data.name}</td>
+                <td>{data.stargazers_count}</td>
+                <td>{data.forks_count}</td>
+                <td>
+                  {data.homepage ? (
+                    <a
+                      href={data.homepage}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      official website
+                    </a>
+                  ) : (
+                    "N/A"
+                  )}
+                </td>
+                <td
+                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
+                >
+                  {data.stargazers_count > 1000 ? (
+                    <>
+                      <img
+                        src={Approve}
+                        alt="approve"
+                        width="12px"
+                        height="12px"
+                      />
+                      <p>Reliable</p>
+                    </>
+                  ) : (
+                    <>
+                      <img
+                        src={Reject}
+                        alt="reject"
+                        width="12px"
+                        height="12px"
+                      />
+                      <p>Unreliable</p>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ) : (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center" }}>
+                  No data available
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </div>
     </>
