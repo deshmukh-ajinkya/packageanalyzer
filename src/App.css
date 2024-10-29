@@ -39,6 +39,7 @@ body {
   flex: 2;
   height: 36px;
   border-radius: 4px;
+  font-family: "Noto Sans";
   border: 1px solid #d6d6d6;
   padding-inline: 12px;
 }
@@ -59,6 +60,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 4px;
+  font-family: "Noto Sans";
 }
 
 .upload-button img {
