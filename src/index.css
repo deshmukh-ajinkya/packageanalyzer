@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Noto Sans";
-  src: url("noto_sans/noto-sans-normal.woff2") format("woff2");
+  src: url("../public/noto_sans/noto-sans-normal.woff2") format("woff2");
   font-weight: 300;
   font-weight: normal;
   font-style: normal;
