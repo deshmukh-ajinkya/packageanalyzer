@@ -2,7 +2,6 @@ import axios from "axios";
 
 export const axiosInstance = axios.create({
   baseURL: "https://api.github.com/search/repositories",
-  timeout: 5000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/vnd.github.v3+json",
@@ -12,14 +11,19 @@ export const axiosInstance = axios.create({
 
 export const searchRepositories = async (query) => {
   try {
+    const encodedQuery = encodeURIComponent(query);
+    console.log(`Fetching repositories for query: ${encodedQuery}`); // Log query
     const response = await axiosInstance.get("", {
       params: {
-        q: query,
+        q: encodedQuery, // Use the encoded query here
       },
     });
-    return response; // Return the data directly
+    return response; // Return the response data
   } catch (error) {
-    console.error("Error fetching repositories:", error);
-    throw error; // Optionally re-throw the error for handling in the calling code
+    console.error(
+      "Error fetching repositories:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
   }
 };
