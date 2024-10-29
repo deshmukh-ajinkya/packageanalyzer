@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
-import Logo from "../../assets/logo.png";
-import Approve from "../../assets/approve.png";
-import Reject from "../../assets/reject.png";
-import Search from "../../assets/search.png";
-import SearchDep from "../../assets/search.gif";
-import Upload from "../../assets/upload.png";
-import { searchRepositories } from "../../config/axios.config";
+import Logo from "../assets/logo.png";
+import Approve from "../assets/approve.png";
+import Reject from "../assets/reject.png";
+import Search from "../assets/search.png";
+import SearchDep from "../assets/search.gif";
+import Upload from "../assets/upload.png";
+import { searchRepositories } from "../config/axios.config";
 import "./style.css";
 
 function Home() {
