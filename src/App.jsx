@@ -1,11 +1,11 @@
+import { useState, useRef } from "react";
 import Logo from "./assets/logo.png";
 import Approve from "./assets/approve.png";
 import Reject from "./assets/reject.png";
 import Search from "./assets/search.png";
 import Upload from "./assets/upload.png";
-import "./App.css";
 import { searchRepositories } from "./config/axios.config";
-import { useState, useRef } from "react";
+import "./App.css";
 
 function App() {
   const [projectName, setProjectName] = useState(""); // State for project name
@@ -108,7 +108,7 @@ function App() {
         <img
           src={Search}
           alt="search-icon"
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer", width: 24 }}
           onClick={handleSearch} // Trigger search on click
         />
         <button
