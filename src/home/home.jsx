@@ -37,21 +37,17 @@ function Home() {
           const fetchedData = await Promise.all(
             dependencies.map(async (dep) => {
               try {
-                const encodedDep = encodeURIComponent(dep);
-                const response = await searchRepositories(encodedDep);
-                if (response && response.data.items.length > 0) {
-                  return response.data.items[0];
+                const response = await searchRepositories(dep);
+                if (response instanceof Error) {
+                  // Handle rate limit error or other errors from searchRepositories
+                  setError(response.message);
+                  return null;
                 }
+                return response.data.items[0];
               } catch (error) {
-                if (
-                  error.message ===
-                  "Rate limit exceeded. Please try again later."
-                ) {
-                  setError(error.message); // Set rate limit error
-                }
                 console.error(`Error fetching data for ${dep}:`, error);
+                return null;
               }
-              return null;
             })
           );
 
@@ -72,28 +68,27 @@ function Home() {
   const handleSearch = async () => {
     if (depName.trim() !== "") {
       try {
-        const encodedDepName = encodeURIComponent(depName);
         setLoading(true);
         setError(""); // Clear previous errors
-        const response = await searchRepositories(encodedDepName);
-        if (response && response.data.items.length > 0) {
-          setTableData([response.data.items[0]]);
+        const response = await searchRepositories(depName);
+        if (response instanceof Error) {
+          // Handle rate limit error or other errors from searchRepositories
+          setError(response.message);
         } else {
-          setTableData([]);
-          alert("No data found for the specified dependency.");
+          if (response && response.data.items.length > 0) {
+            setTableData([response.data.items[0]]);
+          } else {
+            setTableData([]);
+            alert("No data found for the specified dependency.");
+          }
         }
       } catch (error) {
-        if (error.message === "Rate limit exceeded. Please try again later.") {
-          setError(error.message); // Set rate limit error
-        } else {
-          alert("An error occurred while searching for the dependency.");
-        }
+        alert("Exceed with API limit");
       } finally {
         setLoading(false);
       }
     }
   };
-
   const handleUploadClick = () => {
     fileInputRef.current.click();
   };

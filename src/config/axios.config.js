@@ -23,8 +23,6 @@ export const searchRepositories = async (packageName) => {
       throw new Error("Repository URL not found in the npm package.");
     }
 
-    console.log(repoUrl);
-
     // Extract the owner and repo name from the URL
     const repoName = repoUrl
       .replace("git+", "") // Remove 'git+'
@@ -35,8 +33,6 @@ export const searchRepositories = async (packageName) => {
       throw new Error("Owner and repo name could not be extracted.");
     }
 
-    console.log(`Fetching repositories for query: ${ownerAndRepo}`); // Log query
-
     // Fetch repositories from GitHub using the owner and repo name
     const response = await axiosInstance.get("", {
       params: {
@@ -46,10 +42,17 @@ export const searchRepositories = async (packageName) => {
 
     return response; // Return the response data
   } catch (error) {
-    console.error(
-      "Error fetching repositories:",
-      error.response ? error.response.data : error.message
-    );
-    throw error; // Rethrow the error for further handling
+    if (
+      error.response &&
+      error.response.data.message === "Rate limit exceeded"
+    ) {
+      return new Error("Rate limit exceeded. Please try again later.");
+    } else {
+      console.error(
+        "Error fetching repositories:",
+        error.response ? error.response.data : error.message
+      );
+      throw error; // Rethrow other errors
+    }
   }
 };
