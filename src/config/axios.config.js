@@ -5,7 +5,7 @@ export const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/vnd.github.v3+json",
-    Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`, // Access the VITE_ prefixed variable
+    // Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`, // Add Token In Env To Increase Limit
   },
 });
 
