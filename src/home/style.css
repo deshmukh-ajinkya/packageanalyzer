@@ -62,7 +62,6 @@
 }
 
 /* Table styling */
-/* Loader styling */
 .loader {
   height: 65vh;
   display: flex;
@@ -121,4 +120,12 @@
 
 .no-data {
   text-align: center;
+}
+
+.error-message {
+  height: 65vh;
+  display: flex;
+  width: 100vw;
+  place-content: center;
+  place-items: center;
 }
