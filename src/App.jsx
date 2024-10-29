@@ -8,28 +8,33 @@ import { searchRepositories } from "./config/axios.config";
 import "./App.css";
 
 function App() {
-  const [projectName, setProjectName] = useState(""); // State for project name
+  const [projectName, setProjectName] = useState("");
   const [depName, setDepName] = useState("");
   const [tableData, setTableData] = useState([]);
   const fileInputRef = useRef(null);
 
-  // Handle file upload
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file && file.type === "application/json") {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const json = JSON.parse(e.target.result);
-        setProjectName(json.name || "Unknown Project"); // Extract project name
-        const dependencies = Object.keys(json.dependencies || {});
-        setTableData([]); // Clear the table data initially
+        setProjectName(json.name || "Unknown Project");
+
+        // Combine dependencies and devDependencies
+        const dependencies = [
+          ...Object.keys(json.dependencies || {}),
+          ...Object.keys(json.devDependencies || {}),
+        ];
+
+        setTableData([]);
 
         const fetchedData = await Promise.all(
           dependencies.map(async (dep) => {
             try {
               const response = await searchRepositories(dep);
               if (response && response.data.items.length > 0) {
-                return response.data.items[0]; // Get the first match for simplicity
+                return response.data.items[0];
               }
             } catch (error) {
               console.error(`Error fetching data for ${dep}:`, error);
@@ -49,13 +54,12 @@ function App() {
     fileInputRef.current.click();
   };
 
-  // Handle the search by dependency name
   const handleSearch = async () => {
     if (depName.trim() !== "") {
       try {
         const response = await searchRepositories(depName);
         if (response && response.data.items.length > 0) {
-          setTableData([response.data.items[0]]); // Set only the first match
+          setTableData([response.data.items[0]]);
         } else {
           setTableData([]);
         }
@@ -67,40 +71,16 @@ function App() {
 
   return (
     <>
-      <div
-        style={{ padding: "8px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)" }}
-      >
-        <img src={Logo} alt="logo" width={200} />
+      <div className="header">
+        <img src={Logo} alt="logo" className="logo" />
       </div>
-      <div
-        style={{
-          marginTop: "18px",
-          paddingInline: "16px",
-          display: "flex",
-          gap: "12px",
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
-      >
-        <p
-          style={{
-            flex: 3,
-            color: "#008AE6",
-            fontSize: "20px",
-            fontWeight: 600,
-          }}
-        >
-          Project Name: <span style={{ color: "#000000" }}>{projectName}</span>
+      <div className="search-upload-container">
+        <p className="project-name">
+          Project Name: <span>{projectName}</span>
         </p>
         <input
           type="text"
-          style={{
-            flex: 2,
-            height: "36px",
-            borderRadius: "4px",
-            border: "1px solid #D6D6D6",
-            paddingInline: "12px",
-          }}
+          className="input-dependency"
           placeholder="Enter Dependency Name"
           value={depName}
           onChange={(e) => setDepName(e.target.value)}
@@ -108,25 +88,11 @@ function App() {
         <img
           src={Search}
           alt="search-icon"
-          style={{ cursor: "pointer", width: 24 }}
-          onClick={handleSearch} // Trigger search on click
+          className="search-icon"
+          onClick={handleSearch}
         />
-        <button
-          onClick={handleUploadClick}
-          style={{
-            flex: 1,
-            height: "43px",
-            borderRadius: "24px",
-            backgroundColor: "#FFA500",
-            color: "#ffffff",
-            border: "2px solid #D6D6D6",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "4px",
-          }}
-        >
-          <img src={Upload} alt="upload-icon" width="20px" />
+        <button onClick={handleUploadClick} className="upload-button">
+          <img src={Upload} alt="upload-icon" />
           Import package.json
         </button>
         <input
@@ -137,57 +103,25 @@ function App() {
           onChange={handleFileUpload}
         />
       </div>
-      <div
-        style={{
-          border: "1px solid #D6D6D6",
-          marginInline: "12px",
-          borderRadius: "8px",
-          marginTop: "16px",
-          overflowX: "scroll",
-          scrollbarWidth: "none",
-        }}
-      >
-        <table
-          width={"100%"}
-          style={{
-            paddingInline: "12px",
-            textAlign: "left",
-            borderSpacing: "0px 12px",
-          }}
-        >
+      <div className="table-container">
+        <table className="table">
           <thead>
             <tr>
-              <th style={{ fontSize: "18px", fontWeight: 600 }}>Dependency</th>
-              <th style={{ fontSize: "18px", fontWeight: 600 }}>Stars</th>
-              <th style={{ fontSize: "18px", fontWeight: 600 }}>Forks</th>
-              <th style={{ fontSize: "18px", fontWeight: 600 }}>Homepage</th>
-              <th style={{ fontSize: "18px", fontWeight: 600 }}>Descriptor</th>
+              <th>Dependency</th>
+              <th>Stars</th>
+              <th>Forks</th>
+              <th>Homepage</th>
+              <th>Descriptor</th>
             </tr>
           </thead>
           <tbody>
             {tableData.length > 0 ? (
               tableData.map((repo, index) => (
                 <tr key={index}>
-                  <td
-                    style={{
-                      maxWidth: "150px",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {repo.name}
-                  </td>
+                  <td>{repo.name}</td>
                   <td>{repo.stargazers_count}</td>
                   <td>{repo.forks_count}</td>
-                  <td
-                    style={{
-                      maxWidth: "120px",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
+                  <td>
                     {repo.homepage ? (
                       <a
                         href={repo.homepage}
@@ -200,31 +134,15 @@ function App() {
                       "N/A"
                     )}
                   </td>
-                  <td
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                    }}
-                  >
+                  <td className="descriptor">
                     {repo.stargazers_count > 1000 ? (
                       <>
-                        <img
-                          src={Approve}
-                          alt="approve"
-                          width="12px"
-                          height="12px"
-                        />
+                        <img src={Approve} alt="approve" width="12px" />
                         <p>Reliable</p>
                       </>
                     ) : (
                       <>
-                        <img
-                          src={Reject}
-                          alt="reject"
-                          width="12px"
-                          height="12px"
-                        />
+                        <img src={Reject} alt="reject" width="16px" />
                         <p>Unreliable</p>
                       </>
                     )}
@@ -233,7 +151,7 @@ function App() {
               ))
             ) : (
               <tr>
-                <td colSpan="5" style={{ textAlign: "center" }}>
+                <td colSpan="5" className="no-data">
                   No data available
                 </td>
               </tr>
