@@ -61,4 +61,4 @@ Github free tier support only 60 request/hour so if you want increase limit to 5
 
 # How To Use
 
-![Alt text](src\assets\how-to.gif)
+![How To Use](https://github.com/deshmukh-ajinkya/packageanalyzer/raw/main/src/assets/how-to.gif)
