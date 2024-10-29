@@ -12,7 +12,8 @@ function Home() {
   const [projectName, setProjectName] = useState("");
   const [depName, setDepName] = useState("");
   const [tableData, setTableData] = useState([]);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(""); // State for error messages
   const fileInputRef = useRef(null);
 
   const handleFileUpload = (event) => {
@@ -30,7 +31,8 @@ function Home() {
           ];
 
           setTableData([]);
-          setLoading(true); // Start loading
+          setLoading(true);
+          setError(""); // Clear previous errors
 
           const fetchedData = await Promise.all(
             dependencies.map(async (dep) => {
@@ -41,6 +43,12 @@ function Home() {
                   return response.data.items[0];
                 }
               } catch (error) {
+                if (
+                  error.message ===
+                  "Rate limit exceeded. Please try again later."
+                ) {
+                  setError(error.message); // Set rate limit error
+                }
                 console.error(`Error fetching data for ${dep}:`, error);
               }
               return null;
@@ -52,7 +60,7 @@ function Home() {
           console.error("Error parsing JSON or fetching dependencies:", error);
           alert("Invalid JSON format or data could not be fetched.");
         } finally {
-          setLoading(false); // End loading
+          setLoading(false);
         }
       };
       reader.readAsText(file);
@@ -61,15 +69,12 @@ function Home() {
     }
   };
 
-  const handleUploadClick = () => {
-    fileInputRef.current.click();
-  };
-
   const handleSearch = async () => {
     if (depName.trim() !== "") {
       try {
         const encodedDepName = encodeURIComponent(depName);
-        setLoading(true); // Start loading
+        setLoading(true);
+        setError(""); // Clear previous errors
         const response = await searchRepositories(encodedDepName);
         if (response && response.data.items.length > 0) {
           setTableData([response.data.items[0]]);
@@ -78,12 +83,19 @@ function Home() {
           alert("No data found for the specified dependency.");
         }
       } catch (error) {
-        console.error("Error fetching data for the search:", error);
-        alert("An error occurred while searching for the dependency.");
+        if (error.message === "Rate limit exceeded. Please try again later.") {
+          setError(error.message); // Set rate limit error
+        } else {
+          alert("An error occurred while searching for the dependency.");
+        }
       } finally {
-        setLoading(false); // End loading
+        setLoading(false);
       }
     }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
   };
 
   return (
@@ -176,9 +188,13 @@ function Home() {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="no-data">
-                  No data available
-                </td>
+                {error ? (
+                  <p className="error-message">{error}</p>
+                ) : (
+                  <td colSpan="6" className="no-data">
+                    No data available
+                  </td>
+                )}
               </tr>
             )}
           </tbody>
