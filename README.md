@@ -57,3 +57,8 @@ Github free tier support only 60 request/hour so if you want increase limit to 5
 * Paste in .env file with key VITE_GITHUB_TOKEN
 
 * Uncomment code on Path: src\config\axios.config.js
+
+
+# How To Use
+
+![Alt text](src\assets\how-to.gif)
