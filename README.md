@@ -12,7 +12,7 @@
 
 ## How It Works
 
-1. **Input Repository Name**: Enter the name of the GitHub repository or import a `package.json` file.
+1. **Input Repository Name**: Enter the name of the dependency or import a `package.json` file.
 2. **Fetch Data**: The app retrieves real-time data about the repository's metrics.
 3. **View Reports**: Get a comprehensive overview of the repository's reliability, including a breakdown of its dependencies.
 
