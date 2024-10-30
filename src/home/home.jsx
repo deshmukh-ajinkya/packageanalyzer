@@ -83,7 +83,7 @@ function Home() {
           }
         }
       } catch (error) {
-        alert("Exceed with API limit");
+        alert(error.message);
       } finally {
         setLoading(false);
       }
