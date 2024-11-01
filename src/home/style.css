@@ -77,9 +77,10 @@
   margin-top: 16px;
   overflow-x: auto;
   scrollbar-width: none;
-  height: calc(100vh - 180px);
+  height: calc(100vh - 210px);
   display: flex;
   flex-direction: column;
+  
 }
 
 .table {

@@ -195,6 +195,17 @@ function Home() {
           </tbody>
         </table>
       </div>
+      <div
+        style={{
+          marginInline: "12px",
+          paddingBlock: "12px",
+          color: "#d4d4d4",
+        }}
+      >
+        Free Trial Supports Only 60 dependency/package.json OR For Full Version
+        Refer{" "}
+        <a href="https://github.com/deshmukh-ajinkya/packageanalyzer">Readme</a>
+      </div>
     </>
   );
 }
