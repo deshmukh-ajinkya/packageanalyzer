@@ -80,7 +80,6 @@
   height: calc(100vh - 210px);
   display: flex;
   flex-direction: column;
-  
 }
 
 .table {
@@ -129,4 +128,10 @@
   width: 100vw;
   place-content: center;
   place-items: center;
+}
+
+.note {
+  margin-inline: 12px;
+  padding-block: 12px;
+  color: #d4d4d4;
 }
