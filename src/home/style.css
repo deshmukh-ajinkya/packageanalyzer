@@ -9,6 +9,7 @@
 }
 
 /* Search and upload container */
+/* Updated Search and Upload Container */
 .search-upload-container {
   margin-top: 18px;
   padding-inline: 16px;
@@ -19,7 +20,7 @@
 }
 
 .project-name {
-  flex: 3;
+  flex: 6; /* 60% width */
   color: #008ae6;
   font-size: 20px;
   font-weight: 600;
@@ -30,21 +31,23 @@
 }
 
 .input-dependency {
-  flex: 2;
+  flex: 2; /* 20% width (with search icon) */
   height: 36px;
   border-radius: 4px;
   font-family: "Noto Sans";
   border: 1px solid #d6d6d6;
   padding-inline: 12px;
+  margin-right: 12px;
 }
 
 .search-icon {
   cursor: pointer;
   width: 24px;
+  margin-left: -60px; /* To position next to input field */
 }
 
 .upload-button {
-  flex: 1;
+  flex: 2; /* 20% width */
   height: 43px;
   border-radius: 24px;
   background-color: #ffa500;
@@ -55,6 +58,7 @@
   justify-content: center;
   gap: 4px;
   font-family: "Noto Sans";
+  margin-left: 12px;
 }
 
 .upload-button img {
@@ -134,4 +138,10 @@
   margin-inline: 12px;
   padding-block: 12px;
   color: #d4d4d4;
+}
+
+@media (max-width: 768px) {
+  .upload-button {
+    margin-left: 0;
+  }
 }
