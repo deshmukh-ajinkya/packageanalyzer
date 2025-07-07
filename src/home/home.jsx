@@ -13,7 +13,7 @@ function Home() {
   const [depName, setDepName] = useState("");
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(""); // State for error messages
+  const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
   const handleFileUpload = (event) => {
@@ -32,18 +32,21 @@ function Home() {
 
           setTableData([]);
           setLoading(true);
-          setError(""); // Clear previous errors
+          setError("");
 
           const fetchedData = await Promise.all(
             dependencies.map(async (dep) => {
               try {
                 const response = await searchRepositories(dep);
                 if (response instanceof Error) {
-                  // Handle rate limit error or other errors from searchRepositories
                   setError(response.message);
                   return null;
                 }
-                return response.data.items[0];
+                const repoData = response.data.items[0];
+                return {
+                  ...repoData,
+                  originalName: dep, // Use name from package.json
+                };
               } catch (error) {
                 console.error(`Error fetching data for ${dep}:`, error);
                 return null;
@@ -69,14 +72,18 @@ function Home() {
     if (depName.trim() !== "") {
       try {
         setLoading(true);
-        setError(""); // Clear previous errors
+        setError("");
         const response = await searchRepositories(depName);
         if (response instanceof Error) {
-          // Handle rate limit error or other errors from searchRepositories
           setError(response.message);
         } else {
           if (response && response.data.items.length > 0) {
-            setTableData([response.data.items[0]]);
+            setTableData([
+              {
+                ...response.data.items[0],
+                originalName: depName, // Use search input name
+              },
+            ]);
           } else {
             setTableData([]);
             alert("No data found for the specified dependency.");
@@ -89,6 +96,7 @@ function Home() {
       }
     }
   };
+
   const handleUploadClick = () => {
     fileInputRef.current.click();
   };
@@ -142,7 +150,7 @@ function Home() {
           <tbody>
             {loading ? (
               <tr className="loader">
-                <td>
+                <td colSpan="6">
                   <img src={SearchDep} width={96} alt="Loading..." />
                 </td>
               </tr>
@@ -150,7 +158,7 @@ function Home() {
               tableData.map((repo, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
-                  <td>{repo.name}</td>
+                  <td>{repo.originalName}</td>
                   <td>{repo.stargazers_count}</td>
                   <td>{repo.forks_count}</td>
                   <td>
@@ -183,13 +191,9 @@ function Home() {
               ))
             ) : (
               <tr>
-                {error ? (
-                  <p className="error-message">{error}</p>
-                ) : (
-                  <td colSpan="6" className="no-data">
-                    No data available
-                  </td>
-                )}
+                <td colSpan="6" className="no-data">
+                  {error || "No data available"}
+                </td>
               </tr>
             )}
           </tbody>
