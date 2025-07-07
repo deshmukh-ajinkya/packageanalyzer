@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Logo from "../assets/logo.png";
 import Approve from "../assets/approve.png";
 import Reject from "../assets/reject.png";
@@ -14,7 +14,6 @@ function Home() {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const fileInputRef = useRef(null);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -45,7 +44,7 @@ function Home() {
                 const repoData = response.data.items[0];
                 return {
                   ...repoData,
-                  originalName: dep, // Use name from package.json
+                  originalName: dep,
                 };
               } catch (error) {
                 console.error(`Error fetching data for ${dep}:`, error);
@@ -66,6 +65,9 @@ function Home() {
     } else {
       alert("Please upload a valid package.json file.");
     }
+
+    // Allow reselecting the same file
+    event.target.value = null;
   };
 
   const handleSearch = async () => {
@@ -81,7 +83,7 @@ function Home() {
             setTableData([
               {
                 ...response.data.items[0],
-                originalName: depName, // Use search input name
+                originalName: depName,
               },
             ]);
           } else {
@@ -95,10 +97,6 @@ function Home() {
         setLoading(false);
       }
     }
-  };
-
-  const handleUploadClick = () => {
-    fileInputRef.current.click();
   };
 
   return (
@@ -123,17 +121,17 @@ function Home() {
           className="search-icon"
           onClick={handleSearch}
         />
-        <button onClick={handleUploadClick} className="upload-button">
+        <label className="upload-button">
           <img src={Upload} alt="upload-icon" />
           Import package.json
-        </button>
-        <input
-          type="file"
-          ref={fileInputRef}
-          style={{ display: "none" }}
-          accept="application/json"
-          onChange={handleFileUpload}
-        />
+          <input
+            type="file"
+            accept="application/json"
+            style={{ display: "none" }}
+            onClick={(e) => (e.target.value = null)} // Clear previous file
+            onChange={handleFileUpload}
+          />
+        </label>
       </div>
       <div className="table-container">
         <table className="table">
